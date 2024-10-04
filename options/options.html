@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BlockIt Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="options.css">
+
+    <!-- Font Awesome -->
+    <link id="css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+    <!-- Lexend -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend&display=swap">
+    
+</head>
+<body>
+
+    <header>
+        <div id="extensionName">BlockIt</div>
+        <div id="headerText">Dashboard</div>
+    </header>
+
+    <main>
+        <div id="contentGrid">
+            <div id="leftContent">
+                <div id="tableHeader">Your list of blocked hostnames</div>
+
+                <div id="blockedHostnames">
+                    <!-- Dynamically generated list -->
+                </div>
+
+                <div id="hostnameUserInput">
+                    <input type="text" id="hostnameInput" placeholder="Enter hostname...">
+                    <button id="blockHostnameBtn" class="tableBtn tooltip">
+                        <i class="fa-solid fa-check"></i>
+                        <span class="tooltiptext">Block</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="rightContent">
+                <div id="tabKiller">
+                    <div class="functionName">TabKiller statistics</div>
+                    <div id="tabKillerTable" class="tableRowText">
+                        <div class="rowData">
+                            <div>Hostnames blocked</div>
+                            <div id="blockedHostnamesCounter" class="fieldValue"></div>
+                        </div>
+                        <div class="rowData">
+                            <span>Tabs closed</span>
+                            <span id="closedTabsCounter" class="fieldValue"></span>
+                        </div>
+                        <div class="rowData">
+                            <div>Most annoying website</div>
+                            <div id="mostClosedList" class="fieldValue"></div>
+                        </div>
+                        <div class="rowData">
+                            <div>Times it was blocked</div>
+                            <div id="mostClosedCounter" class="fieldValue"></div>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>        
+    </main>
+
+    <footer>
+        <div id="extVersion"></div>
+    </footer>
+
+    <script  src="options.js"></script>
+</body>
+</html>

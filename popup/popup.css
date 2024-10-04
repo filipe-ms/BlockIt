@@ -1,0 +1,69 @@
+body {
+    width: 200px;
+    margin: 0;
+    padding: 10px;
+    font-family: 'Lexend', sans-serif;
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+#extensionName {
+    font-weight: 700;
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #000000;
+}
+
+#statsWrapper {
+    margin-bottom: 15px;
+}
+
+.statsRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-radius: 3px;
+    background-color: #f9f9f9;
+    margin-bottom: 5px;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.8);
+}
+
+.statName {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.statValue {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+#blockHostnameButtonContainer {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+#blockHostname {
+    font-size: 16px;
+    font-weight: 400;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 3px;
+    background-color: #000000;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#blockHostname:hover {
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.8);
+}
+
+#extVersion {
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+}

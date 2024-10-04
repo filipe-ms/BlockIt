@@ -1,0 +1,245 @@
+:root {
+    --default-font: lexend;
+    --default-box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.8);
+    --default-placeholder-text-color: rgba(100, 100, 100, 0.5);
+}
+
+body {
+    margin: 0px;
+    width: 100%;
+}
+
+#extVersion {
+    text-align: center;
+    color: #858585;
+
+    font-family: var(--default-font);
+    font-size: 10px;
+    
+    margin-right: 10px;
+
+    box-shadow: var(--default-box-shadow);
+}
+
+#emptyList {
+    font-family: var(--default-font);
+    font-size: 12px;
+
+    box-shadow: var(--default-box-shadow);
+    border-radius: 3px;
+    
+    margin-top: 12px;
+    padding: 10px 0;
+}
+
+/* HEADER */
+
+#extensionName {
+    font-family: var(--default-font);
+    font-size: 12px;
+    text-align: center;
+    color: #FFFFFF;
+    
+    padding: 5px 0;
+    
+    background-color: #000000;
+}
+
+#headerText {
+    font-family: var(--default-font);
+    font-size: 14px;
+    text-align: center;
+
+    box-shadow: var(--default-box-shadow);
+    padding: 10px 0;
+
+    margin-bottom: 10px;
+}
+
+/* MAIN */
+
+#contentGrid {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 50% 50%;
+    min-width: 800px;
+    margin-bottom: 10px;
+}
+
+#leftContent {
+    text-align: center;
+    margin: 0 auto;
+}
+
+#tableHeader {
+    font-family: var(--default-font);
+    font-size: 20px;
+    font-weight: bold;
+
+    margin-bottom: 10px;
+}
+
+.hostnameRow {
+    display: grid;
+    grid-template-columns: 1fr 25px;
+
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+
+    margin-bottom: 1px;
+}
+
+.hostname {
+    display: inline-block;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    min-height: 26px;
+    line-height: 26px;
+    
+    font-family: var(--default-font);
+    font-size: 14px;
+    text-align: center;
+
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+#hostnameUserInput {
+    display: grid;
+    grid-template-columns: 1fr 25px;
+
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+
+    margin-top: 12px;
+}
+
+#hostnameUserInput input[type="text"] {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    
+    border: 0;
+    border-radius: 3px;
+    padding: 5px;
+
+    height: 26px;
+    width: 160px;
+
+    font-family: var(--default-font);
+    font-size: 12px;
+}
+
+#hostnameUserInput input[type="text"]::-webkit-input-placeholder { /* For WebKit/Blink browsers */
+    color: rgba(90, 90, 90, 0.5); /* Change placeholder text color */
+  }
+
+.tableBtn {
+    -webkit-user-select: none;
+    user-select: none;
+
+    display: inline-block;
+    
+    box-sizing: border-box;
+    border: 0px solid #222222;
+    border-radius: 3px;
+    
+    margin: 0;
+
+    height: 26px;
+    width: 25px;
+
+    background-color: #FFFFFF;
+    
+    color: #222222;
+    font-weight: 600;
+    text-align: center;
+
+    cursor: pointer;
+    touch-action: manipulation;
+
+    transition: box-shadow .2s,-ms-transform .1s,-webkit-transform .1s,transform .1s;
+}
+
+.tableBtn:hover,
+.tableBtn:focus-visible {
+    box-shadow: var(--default-box-shadow);
+    border-radius: 2px;
+}
+
+.tableBtn:active {
+    background-color: #858585;
+    border-color: #000000;
+    transform: scale(.96);
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    position: absolute;
+    top: -8px;
+    left: 115%;
+
+    font-family: var(--default-font);
+    text-align: center;
+    color: #fff;
+    font-weight: 300;
+
+    background-color: #fff;
+
+    height: 21px;
+    border-radius: 3px;
+    
+    z-index: 1;
+    
+    padding: 5px 3px 0 3px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    background-color: #000000;
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.noninteractable {
+    pointer-events: none;
+}
+
+/* TabKiller */
+
+#tabKiller {
+    display: block;
+}
+
+.functionName {
+    text-align: center;
+    font-family: var(--default-font);
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.tableRowText {
+    font-family: var(--default-font);
+    color:#858585;
+}
+
+.fieldValue {
+    margin-left: 10px;
+}
+
+#tabKillerTable .rowData {
+    display: grid;
+    width: fit-content;
+    grid-template-columns: 150px 150px;
+    
+    margin: 0 auto;
+    margin-bottom: 3px;
+}
