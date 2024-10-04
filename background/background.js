@@ -305,8 +305,9 @@ function getClosedTabsCounter() {
                 let getRequest = store.get("closedTabsCounter");
 
                 getRequest.onsuccess = function (event) {
-                    if (event.target.result && event.target.result.count !== undefined) {
-                        resolve({ success: true, count: event.target.result.count });
+                    console.log("getRequest result:", event.target.result);
+                    if (event.target.result && event.target.result.value !== undefined) {
+                        resolve({ success: true, count: event.target.result.value });
                     } else {
                         console.log("Should have returned zero");
                         resolve({ success: true, count: 0 });
