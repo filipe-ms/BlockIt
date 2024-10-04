@@ -46,7 +46,6 @@ function unblockHostname(hostname, itemElement) {
     });
 }
 
-/* Abstracted chrome API call for reuse */
 function sendMessage(action, callback) {
     chrome.runtime.sendMessage({ action: action }, function(response) {
         if (response) {
@@ -63,7 +62,6 @@ function handleEmptyState(values) {
     }
 }
 
-/* Debounce function for rapid clicks */
 function debounce(func, delay) {
     let debounceTimer;
     return function() {
@@ -77,8 +75,9 @@ function debounce(func, delay) {
 document.addEventListener("DOMContentLoaded", function () {
     // Load blocked hostnames
     sendMessage("getBlockedHostnames", function (response) {
-        handleEmptyState(response);
-        renderBlockedHostnames(response);
+        console.log("Blocked hostnames response:", response);
+        handleEmptyState(response.data);
+        renderBlockedHostnames(response.data);
     });
 
     // Display counter for blocked hostnames
@@ -95,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Load tab kill counter
+    // Load tab close counter
     sendMessage("getClosedTabsCounter", function (response) {
         if (response.success) {
             if (response.value === 0) {

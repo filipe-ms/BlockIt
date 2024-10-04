@@ -104,9 +104,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         case "getBlockedHostnames":
             getBlockedHostnames()
                 .then((response) => {
+                    console.log("Blocked hostnames fetched:", response);
                     sendResponse({ success: true, data: response });
                 })
                 .catch((error) => {
+                    console.error("Error fetching blocked hostnames:", error);
                     sendResponse({ success: false, error: error.message });
                 });
             return true;
