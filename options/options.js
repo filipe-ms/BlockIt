@@ -181,5 +181,5 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 300)); // Debounced click with a 300ms delay
 
     // Version Info
-    document.getElementById('extVersion').textContent = `0.0.1 (04.10.24) First Public Release`;
+    document.getElementById('extVersion').textContent = `0.0.2 (08.10.24) First Public Release`;
 });
