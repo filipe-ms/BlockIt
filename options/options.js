@@ -39,7 +39,12 @@ function attachUnblockListeners() {
 function unblockHostname(hostname, itemElement) {
     chrome.runtime.sendMessage({ action: "unblockHostname", hostname }, function(response) {
         if (response) {
-            itemElement.remove(); // Remove item from the DOM without reload
+            itemElement.remove();
+            
+            const blockedHostnamesList = document.querySelectorAll('.hostnameRow');
+            if (blockedHostnamesList.length === 0) {
+                document.getElementById("blockedHostnames").innerHTML = `<div id="emptyList">You don't have any blocked<br>hostname to display yet.</div>`;
+            }
         } else {
             console.error("Failed to remove hostname:", hostname);
         }
@@ -129,17 +134,23 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("blockHostnameBtn").addEventListener("click", debounce(function() {
         const inputElement = document.getElementById("hostnameInput");
         const hostnameToBlock = inputElement.value.trim();
-
+    
         if (!hostnameToBlock) {
             alert("Please enter a valid hostname.");
             return;
         }
-
+    
         chrome.runtime.sendMessage({ action: "blockHostname", hostname: hostnameToBlock }, function(response) {
             if (response) {
                 const newHostname = { address: hostnameToBlock };
                 const blockedHostnamesList = document.getElementById("blockedHostnames");
-
+    
+                // Remove empty list message if present
+                const emptyMessage = document.getElementById("emptyList");
+                if (emptyMessage) {
+                    emptyMessage.remove();
+                }
+    
                 // Create a new element for the newly added hostname
                 const newElement = document.createElement('div');
                 newElement.classList.add('hostnameRow');  // Add the correct class
@@ -152,12 +163,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         </button>
                     </div>
                 `;
-
+    
                 // Append the new element to the blocked hostnames list
                 blockedHostnamesList.appendChild(newElement);
-
+    
                 inputElement.value = ""; // Clear input field
-
+    
                 // Attach event listener for unblocking the newly added hostname
                 const unblockButton = newElement.querySelector('.unblockHostnameButton');
                 unblockButton.addEventListener('click', function() {
