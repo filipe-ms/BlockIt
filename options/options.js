@@ -2,8 +2,7 @@
  ***** OPTIONS.JS *****
  *                    */
 
-
-/* Creating the blocked hostnames table */
+// Creating the blocked hostnames table */
 function buildTableContent(values) {
     return values.map(item => `
         <div class="hostnameRow">
@@ -18,55 +17,70 @@ function buildTableContent(values) {
 }
 
 function renderBlockedHostnames(values) {
+    const blockedHostnamesContainer = document.getElementById("blockedHostnames");
+    if (!blockedHostnamesContainer) {
+        console.error("Blocked hostnames container not found.");
+        return;
+    }
+
     const content = values && values.length > 0
         ? buildTableContent(values)
         : `<div id="emptyList">You don't have any blocked<br>hostname to display yet.</div>`;
     
-    document.getElementById("blockedHostnames").innerHTML = content;
-    attachUnblockListeners(); // Attach event listeners to unblock buttons
+    blockedHostnamesContainer.innerHTML = content;
 }
 
-function attachUnblockListeners() {
-    const unblockButtons = document.querySelectorAll('.unblockHostnameButton');
-    unblockButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const hostnameToRemove = button.dataset.hostname;
-            unblockHostname(hostnameToRemove, button.closest('.hostnameRow'));
-        });
-    });
-}
 
-function unblockHostname(hostname, itemElement) {
-    chrome.runtime.sendMessage({ action: "unblockHostname", hostname }, function(response) {
-        if (response) {
-            itemElement.remove();
-            
-            const blockedHostnamesList = document.querySelectorAll('.hostnameRow');
-            if (blockedHostnamesList.length === 0) {
-                document.getElementById("blockedHostnames").innerHTML = `<div id="emptyList">You don't have any blocked<br>hostname to display yet.</div>`;
-            }
-        } else {
-            console.error("Failed to remove hostname:", hostname);
-        }
-    });
-}
-
+// Function to send messages to the background script and handles its response
 function sendMessage(action, callback) {
     chrome.runtime.sendMessage({ action: action }, function(response) {
-        if (response) {
+        if (chrome.runtime.lastError) {
+            console.error(`Error sending message for action '${action}':`, chrome.runtime.lastError.message);
+            callback({ success: false, error: chrome.runtime.lastError.message });
+        } else if (response) {
             callback(response);
         } else {
-            console.error(`Failed to perform action: ${action}`, response);
+            console.error(`No response received for action: ${action}`);
+            callback({ success: false, error: "No response received." });
         }
     });
 }
 
+
+// Displays a message to the user for a specified duration.
+function showMessage(elementId, message, isError = true) {
+    const messageElement = document.getElementById(elementId);
+    if (!messageElement) {
+        console.error(`Message element with ID '${elementId}' not found.`);
+        return;
+    }
+    messageElement.textContent = message;
+    messageElement.style.color = isError ? 'red' : 'green';
+    setTimeout(() => {
+        messageElement.textContent = '';
+    }, 3000); // Message disappears after 3 seconds
+}
+
+
+// Handles the empty state of the blocked hostnames list.
 function handleEmptyState(values) {
+    const blockedHostnamesContainer = document.getElementById("blockedHostnames");
+    if (!blockedHostnamesContainer) {
+        console.error("Blocked hostnames container not found.");
+        return;
+    }
     if (values.length === 0) {
-        document.getElementById("blockedHostnames").innerHTML = `<div id="emptyList">You don't have any blocked<br>hostname to display yet.</div>`;
+        blockedHostnamesContainer.innerHTML = `<div id="emptyList">You don't have any blocked<br>hostname to display yet.</div>`;
+    } else {
+        // If there are values, ensure the empty list message is removed if it was present
+        const emptyMessage = document.getElementById("emptyList");
+        if (emptyMessage) {
+            emptyMessage.remove();
+        }
     }
 }
 
+// Function to debounce clicks. Delay is in milliseconds.
 function debounce(func, delay) {
     let debounceTimer;
     return function() {
@@ -77,109 +91,113 @@ function debounce(func, delay) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    // Load blocked hostnames
+// Unblocks a hostname and updates the UI
+function unblockHostname(hostname, itemElement) {
+    chrome.runtime.sendMessage({ action: "unblockHostname", hostname }, function(response) {
+        if (response && response.success) {
+            if (itemElement) {
+                itemElement.remove(); // Remove the specific row from the DOM
+            }
+            updateAllCounters(); // Refresh all counters and the list
+            showMessage("hostnameMessage", `"${hostname}" unblocked successfully!`, false);
+        } else {
+            console.error("Failed to unblock hostname:", hostname, response ? response.error : "Unknown error");
+            showMessage("hostnameMessage", `Failed to unblock "${hostname}". ${response && response.error ? response.error : ''}`, true);
+        }
+    });
+}
+
+// Fetches and updates all counters and the blocked hostnames list.
+function updateAllCounters() {
+    // Re-fetch and update blocked hostnames list
     sendMessage("getBlockedHostnames", function (response) {
-        console.log("Blocked hostnames response:", response);
-        handleEmptyState(response.data);
-        renderBlockedHostnames(response.data);
+        if (response.success) {
+            handleEmptyState(response.data);
+            renderBlockedHostnames(response.data);
+        } else {
+            console.error("Error fetching blocked hostnames for display:", response.error);
+            document.getElementById("blockedHostnames").innerHTML = `<div id="emptyList" style="color:red;">Error loading blocked hostnames.</div>`;
+        }
     });
 
-    // Display counter for blocked hostnames
+    // Re-fetch and update blocked hostnames counter
     sendMessage("getBlockedHostnamesCounter", function (response) {
         if (response.success) {
-            if (response.value === 0) {
-                document.getElementById("blockedHostnamesCounter").innerText = "None.";
-            } else {
-                document.getElementById("blockedHostnamesCounter").innerText = response.value;
-            }
+            document.getElementById("blockedHostnamesCounter").innerText = response.value === 0 ? "None." : response.value;
         } else {
-            console.log("Error:", response.error);
-            document.getElementById("blockedHostnamesCounter").innerText = "None.";
+            console.error("Error fetching blocked hostnames counter:", response.error);
+            document.getElementById("blockedHostnamesCounter").innerText = "Error";
         }
     });
 
-    // Load tab close counter
+    // Re-fetch and update closed tabs counter
     sendMessage("getClosedTabsCounter", function (response) {
         if (response.success) {
-            if (response.value === 0) {
-                document.getElementById("closedTabsCounter").innerText = "None.";
-            } else {
-                document.getElementById("closedTabsCounter").innerText = response.value;
-            }
+            document.getElementById("closedTabsCounter").innerText = response.value === 0 ? "None." : response.value;
         } else {
-            console.log("Error:", response.error);
-            document.getElementById("closedTabsCounter").innerText = "None.";
+            console.error("Error fetching closed tabs counter:", response.error);
+            document.getElementById("closedTabsCounter").innerText = "Error";
         }
     });
 
-    // Load most closed hostnames
+    // Re-fetch and update most closed hostnames
     sendMessage("getMostClosedHostnames", function (response) {
-        if (response && response.hostnames && Array.isArray(response.hostnames)) {
+        if (response && response.success) { // Ensure response.success is checked
             document.getElementById("mostClosedList").textContent = response.hostnames.length !== 0 ? response.hostnames.join(", ") : "None.";
-        } else {
-            document.getElementById("mostClosedList").textContent = "None.";
-            console.error("Invalid or missing 'hostnames' in response:", response);
-        }
-    
-        if (response && response.highestCounter !== undefined) {
             document.getElementById("mostClosedCounter").textContent = response.highestCounter !== null ? response.highestCounter : "None.";
         } else {
-            document.getElementById("mostClosedCounter").textContent = "None.";
-            console.error("Invalid or missing 'highestCounter' in response:", response);
+            console.error("Invalid or missing 'hostnames' or 'highestCounter' in response for most closed hostnames:", response);
+            document.getElementById("mostClosedList").textContent = "Error";
+            document.getElementById("mostClosedCounter").textContent = "Error";
+        }
+    });
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Initialize all counters and the blocked hostnames list on page load
+    updateAllCounters();
+
+    // Event delegation for unblock buttons on the #blockedHostnames container
+    document.getElementById("blockedHostnames").addEventListener("click", function(event) {
+        const clickedButton = event.target.closest(".unblockHostnameButton");
+        if (clickedButton) {
+            const hostnameToRemove = clickedButton.dataset.hostname;
+            const itemElement = clickedButton.closest('.hostnameRow');
+            unblockHostname(hostnameToRemove, itemElement);
         }
     });
 
-    // Block a new hostname
+    // Event listener for blocking a new hostname (debounced to prevent multiple rapid submissions)
     document.getElementById("blockHostnameBtn").addEventListener("click", debounce(function() {
         const inputElement = document.getElementById("hostnameInput");
         const hostnameToBlock = inputElement.value.trim();
     
         if (!hostnameToBlock) {
-            alert("Please enter a valid hostname.");
+            showMessage("hostnameMessage", "Please enter a valid hostname.", true);
             return;
         }
     
         chrome.runtime.sendMessage({ action: "blockHostname", hostname: hostnameToBlock }, function(response) {
-            if (response) {
-                const newHostname = { address: hostnameToBlock };
-                const blockedHostnamesList = document.getElementById("blockedHostnames");
-    
-                // Remove empty list message if present
-                const emptyMessage = document.getElementById("emptyList");
-                if (emptyMessage) {
-                    emptyMessage.remove();
-                }
-    
-                // Create a new element for the newly added hostname
-                const newElement = document.createElement('div');
-                newElement.classList.add('hostnameRow');  // Add the correct class
-                newElement.innerHTML = `
-                    <div class="hostname">${newHostname.address}</div>
-                    <div>
-                        <button class="tableBtn tooltip unblockHostnameButton" data-hostname="${newHostname.address}">
-                            <i class="fa-solid fa-xmark"></i>
-                            <span class="tooltiptext">Unblock</span>
-                        </button>
-                    </div>
-                `;
-    
-                // Append the new element to the blocked hostnames list
-                blockedHostnamesList.appendChild(newElement);
-    
+            if (response && response.success) {
+                // Input was successful, clear input and refresh UI.
                 inputElement.value = ""; // Clear input field
-    
-                // Attach event listener for unblocking the newly added hostname
-                const unblockButton = newElement.querySelector('.unblockHostnameButton');
-                unblockButton.addEventListener('click', function() {
-                    unblockHostname(newHostname.address, newElement);
-                });
+                updateAllCounters(); // Refresh all stats, including the list of hostnames
+                showMessage("hostnameMessage", `"${hostnameToBlock}" blocked successfully!`, false);
             } else {
-                console.error("Failed to block hostname:", hostnameToBlock);
+                console.error("Failed to block hostname:", hostnameToBlock, response ? response.error : "Unknown error");
+                showMessage("hostnameMessage", `Failed to block "${hostnameToBlock}". ${response && response.error ? response.error : ''}`, true);
             }
         });
-    }, 300)); // Debounced click with a 300ms delay
+    }, 300)); // Debounce a click with a 300ms delay
+
+    chrome.runtime.onMessage.addListener(function(message) {
+        if (message.action === "refreshOptionsPage") {
+            console.log("Received refreshOptionsPage message. Updating counters.");
+            updateAllCounters(); // Trigger a refresh of all data and UI
+        }
+    });
 
     // Version Info
-    document.getElementById('extVersion').textContent = `0.0.2 (08.10.24) First Public Release`;
+    document.getElementById('extVersion').textContent = `ver. 0.0.3`;
 });

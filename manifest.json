@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
   "name": "BlockIt",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "permissions": [
     "storage",
-    "activeTab"
+    "activeTab",
+    "tabs"
   ],
   "options_page": "/options/options.html",
   "action": {
